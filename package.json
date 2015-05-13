@@ -1,0 +1,22 @@
+{
+  "name": "mongo-native",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -b -t 5000 --check-leaks -R spec test/index.js",
+    "jshint": "jshint index.js lib/*"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^5.0.6",
+    "lodash": "^3.8.0",
+    "mongodb": "^2.0.31",
+    "q": "^1.4.0"
+  },
+  "devDependencies": {
+    "bson": "^0.3.2",
+    "mocha": "^2.2.4"
+  }
+}
