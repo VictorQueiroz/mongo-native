@@ -127,6 +127,14 @@ describe('collection', function () {
 		});
 	})
 
+	it('should support the one callback method', function (done) {
+		db.collection('testing_collection_cbs', function (err, coll) {
+			assert.equal(null, err)
+			assert.ok(coll instanceof Native.Collection)
+			done();
+		});
+	});
+
 	it('should retrieves this collections index info', function (done) {
 		var collection = db.collection('more_index_information_test_2');
 	  // Insert a bunch of documents for the index

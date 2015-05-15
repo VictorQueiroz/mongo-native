@@ -118,7 +118,6 @@ describe('db', function () {
 		Native.connect('mongodb://localhost/dbtest').then(function (db) {
 			called = false;
 			db.on('close', function (e) {
-				console.log(e);
 				called = true;
 			});
 
@@ -176,6 +175,16 @@ describe('db', function () {
 
 	it('should open the database', function (done) {
 		db.open().then(function (d) {
+			done();
+		}, function (err) {
+			done(err);
+		});
+	})
+
+	it('should fetch a specific collection (containing the actual collection information)', function (done) {
+		db.collection('should_open_database', function (err, collection) {
+			assert.equal(null, err)
+			assert.ok(collection instanceof Native.Collection);
 			done();
 		}, function (err) {
 			done(err);
