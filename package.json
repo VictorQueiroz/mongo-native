@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "bson": "^0.3.2",
-    "mocha": "^2.2.4"
+    "mocha": "^2.2.4",
+    "randomstring": "^1.0.5"
   }
 }

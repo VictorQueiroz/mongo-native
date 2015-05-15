@@ -23,7 +23,8 @@ MongoClient.connect('mongodb://localhost/testdb', function (err, db) {
 		return console.log(err);
 	}
 
-	global.db = db;
+	var Db = require('../index').Db;
+	global.db = new Db(db);
 	global.assert = require('assert');
 	global.ObjectId = require('bson').ObjectId;
 

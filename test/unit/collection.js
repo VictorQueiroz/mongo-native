@@ -1,7 +1,5 @@
-var Native = require('../../index')(global.db);
-
 describe('collection', function () {
-	var users = Native.collection('users');
+	var users = db.collection('users');
 
 	it('should insert a document', function (done) {
 		users.insert([
@@ -17,7 +15,7 @@ describe('collection', function () {
 	})
 
 	it('should drops an index from this collection', function () {
-		users.drop().then(function(result) {
+		users.deleteMany({}, {w:1}).then(function(result) {
 	    // Create an index on the a field
 	    return users.ensureIndex({a:1, b:1}, {unique:true, background:true, w:1});
 	  }).then(function(indexName) {
@@ -35,25 +33,26 @@ describe('collection', function () {
     });
 	})
 
-	it('should find a collection', function (done) {
-		var testingUsers = Native.collection('testing-users');
+	it('should creates a cursor for a query that can be used to iterate over results from MongoDB', function (done) {
+		var collection = db.collection('simple_query');
 
-		testingUsers.drop().then(function () {
-			return testingUsers.insertMany([{a:1}, {a:2}, {a:3}], {w:1})
-		}).then(function(result) {
+	  // Insert a bunch of documents for the testing
+	  collection.deleteMany({}, {w:1}).then(function () {
+			return collection.insertMany([{a:1}, {a:2}, {a:3}], {w:1});
+		}).then(function () {
 	    // Peform a simple find and return all the documents
-	    return testingUsers.find();
-	  }).then(function(users) {
-      assert.equal(3, users.length);
+	    return collection.find();
+	  }).then(function(docs) {
+      assert.equal(3, docs.length);
       done();
     }, function (err) {
-    	throw err;
+    	done(err);
     });
 	})
 
 	it('should find a document', function (done) {
 		var id;
-		users.drop().then(function () {
+		users.deleteMany({}, {w:1}).then(function () {
 			return users.insertMany([{a:1}, {a:2}, {a:3}], {w:1});
 		}).then(function () {
 			return users.find();
@@ -129,16 +128,16 @@ describe('collection', function () {
 	})
 
 	it('should retrieves this collections index info', function (done) {
-		var collection = Native.collection('more_index_information_test_3');
+		var collection = db.collection('more_index_information_test_2');
 	  // Insert a bunch of documents for the index
-	  collection.drop().then(function () {
+	  collection.deleteMany({}, {w:1}).then(function () {
 	  	return collection.insertMany([{a:1, b:1}, {a:2, b:2}, {a:3, b:3}, {a:4, b:4}], {w:1});
 	  }).then(function () {
 	    // Create an index on the a field
 	    return collection.ensureIndex({a:1, b:1}, {unique:true, background:true, w:1});
 		}).then(function(indexName) {
       // Fetch basic indexInformation for collection
-      return collection.indexInformation();
+      return db.indexInformation('more_index_information_test_2');
     }).then(function(indexInformation) {
       assert.deepEqual([ [ '_id', 1 ] ], indexInformation._id_);
       assert.deepEqual([ [ 'a', 1 ], [ 'b', 1 ] ], indexInformation.a_1_b_1);
