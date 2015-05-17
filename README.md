@@ -2,6 +2,8 @@
 
 Native MongoDB API with promises just to make you happy.
 
+We're just following the `mongodb` npm package api, which you can check [here](http://mongodb.github.io/node-mongodb-native/2.0/api/).
+
 ### Installation (npm)
 ```
 npm install --save mongo-native
@@ -9,9 +11,9 @@ npm install --save mongo-native
 
 ### Examples
 ```js
-var Native = require('mongo-native');
+var MongoNative = require('mongo-native');
 
-Native.connect('mongodb://localhost/native-db').then(function (db) {
+MongoNative.connect('mongodb://localhost/native-db').then(function (db) {
 	var users = db.collection('users');
 
 	users.insertMany([{name: 'kris kowal'}, {name: 'tj'}, {name: 'douglas crockford'}]).then(function (docs) {
@@ -51,11 +53,48 @@ app.listen(3000, function () {
 ```
 
 ```js
-var Native = require('mongo-native');
-Native.connect('mongodb://localhost/mydb').then(function (db) {
+var docs = [{
+  title : "this is my title", author : "bob", posted : new Date() ,
+  pageViews : 5, tags : [ "fun" , "good" , "fun" ], other : { foo : 5 },
+  comments : [
+    { author :"joe", text : "this is cool" }, { author :"sam", text : "this is bad" }
+  ]}];
+
+// Create a collection
+var collection = db.collection('aggregationExample1');
+// Insert the docs
+collection.deleteMany({}, {w:1}).then(function () {
+	return collection.insertMany(docs, {w: 1});
+}).then(function(result) {
+  // Execute aggregate, notice the pipeline is expressed as an Array
+  var promise = collection.aggregate([
+      { $project : {
+        author : 1,
+        tags : 1
+      }},
+      { $unwind : "$tags" },
+      { $group : {
+        _id : {tags : "$tags"},
+        authors : { $addToSet : "$author" }
+      }}
+  ]);
+
+  return promise;
+}).then(function(result) {
+  res.json(result);
+}, function (err) {
+	console.log(err);
+	res.status(400).end();
+});
+```
+
+```js
+MongoNative.connect('mongodb://localhost/mydb').then(function (db) {
 	var users = db.collection('users');
 	return users.find();
 }).then(function (users) {
 	assert.equal(300000, users.length);
 });
 ```
+
+Do you mean... [More examples](https://github.com/VictorQueiroz/mongo-native/tree/master/test/unit)? o:

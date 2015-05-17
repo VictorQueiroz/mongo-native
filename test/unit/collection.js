@@ -38,8 +38,9 @@ describe('collection', function () {
 	it('should creates a cursor for a query that can be used to iterate over results from MongoDB', function (done) {
 		var collection = db.collection('simple_query');
 
-	  // Insert a bunch of documents for the testing
+	  // Clean the collection
 	  collection.deleteMany({}, {w:1}).then(function () {
+	  	// Insert a bunch of documents for the testing
 			return collection.insertMany([{a:1}, {a:2}, {a:3}], {w:1});
 		}).then(function () {
 	    // Peform a simple find and return all the documents
@@ -132,15 +133,16 @@ describe('collection', function () {
 	it('should support the one callback method', function (done) {
 		db.collection('testing_collection_cbs', function (err, coll) {
 			assert.equal(null, err)
-			assert.ok(coll instanceof Native.Collection)
+			assert.ok(coll instanceof MongoNative.Collection)
 			done();
 		});
 	});
 
 	it('should retrieves this collections index info', function (done) {
 		var collection = db.collection('more_index_information_test_2');
-	  // Insert a bunch of documents for the index
+	  // Clean the collection
 	  collection.deleteMany({}, {w:1}).then(function () {
+	  	// Insert a bunch of documents for the index
 	  	return collection.insertMany([{a:1, b:1}, {a:2, b:2}, {a:3, b:3}, {a:4, b:4}], {w:1});
 	  }).then(function () {
 	    // Create an index on the a field
@@ -162,6 +164,18 @@ describe('collection', function () {
     	done(err)
     });
 	})
+
+	it('should return collection name', function (done) {
+		var collection = db.collection('test_collection_name')
+		collection.deleteMany({},{w:1}).then(function () {
+			return collection.insertMany([{a:1,b:2}, {a:3,b:4}],{w:1});
+		}).then(function () {
+			assert.equal('test_collection_name', collection.collectionName);
+			done();
+		}, function (err) {
+			done(err);
+		})
+	})
 	
 	describe('aggregate', function () {
 		it('should execute an aggregation framework pipeline against the collection', function (done) {
@@ -174,8 +188,9 @@ describe('collection', function () {
 
 		  // Create a collection
 		  var collection = db.collection('aggregationExample1');
-		  // Insert the docs
+		  // Remove the docs
 		  collection.deleteMany({}, {w:1}).then(function () {
+		  	// Insert the docs
 		  	return collection.insertMany(docs, {w: 1});
 		  }).then(function(result) {
 		    // Execute aggregate, notice the pipeline is expressed as an Array
@@ -216,23 +231,24 @@ describe('collection', function () {
 
 			// Create a collection
 			var collection = db.collection('aggregationExample2');
-			// Insert the docs
+			// Remove the docs, for safe
 			collection.deleteMany({},{w:1}).then(function () {
+				// Insert the docs
 		  	return collection.insertMany(docs, {w: 1});
 		  }).then(function(result) {
 
 			  // Execute aggregate, notice the pipeline is expressed as an Array
 			  var cursor = collection.aggregate([
-			      { $project : {
-			        author : 1,
-			        tags : 1
-			      }},
-			      { $unwind : "$tags" },
-			      { $group : {
-			        _id : {tags : "$tags"},
-			        authors : { $addToSet : "$author" }
-			      }}
-			    ], { cursor: { batchSize: 1 } });
+		      { $project : {
+		        author : 1,
+		        tags : 1
+		      }},
+		      { $unwind : "$tags" },
+		      { $group : {
+		        _id : {tags : "$tags"},
+		        authors : { $addToSet : "$author" }
+		      }}
+		    ], { cursor: { batchSize: 1 } });
 
 			  cursor.once('error', function (err) {
 		    	done(err);
@@ -262,8 +278,9 @@ describe('collection', function () {
 
 		  // Create a collection
 		  var collection = db.collection('aggregationExample3');
-		  // Insert the docs
+	 		// Remove the docs
 		  collection.deleteMany({},{w:1}).then(function () {
+		 		// Insert the docs
 		  	return collection.insertMany(docs, {w: 1});
 		  }).then(function(result) {
 		    // Execute aggregate, notice the pipeline is expressed as an Array

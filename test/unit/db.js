@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var Q = require('q');
-var Native = require('../../');
+var MongoNative = require('../../');
 
 describe('db', function () {
 	it('should add a user to the database', function (done) {
@@ -115,7 +115,7 @@ describe('db', function () {
 
 	it('should emit native events', function (done) {
 		var called;
-		Native.connect('mongodb://localhost/dbtest').then(function (db) {
+		MongoNative.connect('mongodb://localhost/dbtest').then(function (db) {
 			called = false;
 			db.on('close', function (e) {
 				called = true;
@@ -184,7 +184,7 @@ describe('db', function () {
 	it('should fetch a specific collection (containing the actual collection information)', function (done) {
 		db.collection('should_open_database', function (err, collection) {
 			assert.equal(null, err)
-			assert.ok(collection instanceof Native.Collection);
+			assert.ok(collection instanceof MongoNative.Collection);
 			done();
 		}, function (err) {
 			done(err);

@@ -1,13 +1,17 @@
 {
   "name": "mongo-native",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Native MongoDB API with promises just to make you happy",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -b -t 5000 --check-leaks -R spec test/index.js",
+    "test": "node test/index.js",
     "jshint": "jshint index.js lib/*"
   },
-  "author": "",
+  "author": {
+    "name": "Victor Queiroz",
+    "email": "victorcqueirozg@gmail.com",
+    "twitter": "victor_queirozg"
+  },
   "license": "MIT",
   "dependencies": {
     "lodash": "^3.8.0",
