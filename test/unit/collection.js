@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 describe('collection', function () {
 	var users = db.collection('users');
 
@@ -159,5 +161,141 @@ describe('collection', function () {
     }, function (err) {
     	done(err)
     });
+	})
+	
+	describe('aggregate', function () {
+		it('should execute an aggregation framework pipeline against the collection', function (done) {
+			var docs = [{
+	      title : "this is my title", author : "bob", posted : new Date() ,
+	      pageViews : 5, tags : [ "fun" , "good" , "fun" ], other : { foo : 5 },
+	      comments : [
+	        { author :"joe", text : "this is cool" }, { author :"sam", text : "this is bad" }
+	      ]}];
+
+		  // Create a collection
+		  var collection = db.collection('aggregationExample1');
+		  // Insert the docs
+		  collection.deleteMany({}, {w:1}).then(function () {
+		  	return collection.insertMany(docs, {w: 1});
+		  }).then(function(result) {
+		    // Execute aggregate, notice the pipeline is expressed as an Array
+		    var promise = collection.aggregate([
+		        { $project : {
+		          author : 1,
+		          tags : 1
+		        }},
+		        { $unwind : "$tags" },
+		        { $group : {
+		          _id : {tags : "$tags"},
+		          authors : { $addToSet : "$author" }
+		        }}
+		    ]);
+
+		    assert.ok(_.isUndefined(promise.toArray));
+
+		    return promise;
+		  }).then(function(result) {
+	      assert.equal('good', result[0]._id.tags);
+	      assert.deepEqual(['bob'], result[0].authors);
+	      assert.equal('fun', result[1]._id.tags);
+	      assert.deepEqual(['bob'], result[1].authors);
+	      done();
+		  }, function (err) {
+		  	done(err);
+		  });
+		});
+
+		it('should correctly call the aggregation using a cursor', function (done) {
+			var docs = [{
+		    title : "this is my title", author : "bob", posted : new Date() ,
+		    pageViews : 5, tags : [ "fun" , "good" , "fun" ], other : { foo : 5 },
+		    comments : [
+		      { author :"joe", text : "this is cool" }, { author :"sam", text : "this is bad" }
+		    ]
+		  }];
+
+			// Create a collection
+			var collection = db.collection('aggregationExample2');
+			// Insert the docs
+			collection.deleteMany({},{w:1}).then(function () {
+		  	return collection.insertMany(docs, {w: 1});
+		  }).then(function(result) {
+
+			  // Execute aggregate, notice the pipeline is expressed as an Array
+			  var cursor = collection.aggregate([
+			      { $project : {
+			        author : 1,
+			        tags : 1
+			      }},
+			      { $unwind : "$tags" },
+			      { $group : {
+			        _id : {tags : "$tags"},
+			        authors : { $addToSet : "$author" }
+			      }}
+			    ], { cursor: { batchSize: 1 } });
+
+			  cursor.once('error', function (err) {
+		    	done(err);
+		    });
+
+			  // Get all the aggregation results
+			  cursor.toArray(function(err, docs) {
+		      assert.equal(null, err);
+		      assert.equal(2, docs.length);
+		      done();
+		    });
+			}).then(function(docs) {
+		    assert.equal(2, docs.length);
+		  }, function (err) {
+		  	done(err);
+		  });
+		});
+
+		it('should correctly call the aggregation using a read stream', function (done) {
+			// Some docs for insertion
+		  var docs = [{
+		      title : "this is my title", author : "bob", posted : new Date() ,
+		      pageViews : 5, tags : [ "fun" , "good" , "fun" ], other : { foo : 5 },
+		      comments : [
+		        { author :"joe", text : "this is cool" }, { author :"sam", text : "this is bad" }
+		      ]}];
+
+		  // Create a collection
+		  var collection = db.collection('aggregationExample3');
+		  // Insert the docs
+		  collection.deleteMany({},{w:1}).then(function () {
+		  	return collection.insertMany(docs, {w: 1});
+		  }).then(function(result) {
+		    // Execute aggregate, notice the pipeline is expressed as an Array
+		    var cursor = collection.aggregate([
+		        { $project : {
+		          author : 1,
+		          tags : 1
+		        }},
+		        { $unwind : "$tags" },
+		        { $group : {
+		          _id : {tags : "$tags"},
+		          authors : { $addToSet : "$author" }
+		        }}
+		      ], { cursor: { batchSize: 1 } });
+
+		    var count = 0;
+		    // Get all the aggregation results
+		    cursor.on('data', function(doc) {
+		      count = count + 1;
+		    });
+
+		    cursor.once('end', function() {
+		      assert.equal(2, count);
+		      done();
+		    });
+
+		    cursor.once('error', function (err) {
+		    	done(err);
+		    });
+		  }, function (err) {
+		  	done(err);
+		  });
+		})
 	})
 })

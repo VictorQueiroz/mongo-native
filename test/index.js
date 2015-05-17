@@ -11,7 +11,8 @@ var testFiles = glob.sync(path.join(__dirname, '**/*.js'));
 var mocha = new Mocha({
 	reporter: 'spec',
 	ui: 'bdd',
-	watch: true
+	watch: true,
+	timeout: 90000
 });
 
 _.forEach(testFiles, function (filePath) {
