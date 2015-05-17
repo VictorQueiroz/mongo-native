@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Q = require('q');
 var MongoNative = require('../../');
+var randomstring = require('randomstring');
 
 describe('db', function () {
 	it('should add a user to the database', function (done) {
@@ -131,14 +132,15 @@ describe('db', function () {
 	})
 
 	it('should authenticate a user against the server', function (done) {
-		db.addUser('user2', 'name').then(function(result) {
+		var username = randomstring.generate(7);
+		db.addUser(username, 'name').then(function(result) {
 	    // Authenticate
-	    return db.authenticate('user2', 'name');
+	    return db.authenticate(username, 'name');
 	  }).then(function(result) {
 			assert.equal(true, result);
 
 			// Remove the user from the db
-			return db.removeUser('user2');
+			return db.removeUser(username);
 		}).then(function(result) {
 			assert.ok(result);
 			done();

@@ -32,7 +32,8 @@ MongoClient.connect('mongodb://localhost/testdb', {replSet: ['testdb']}, functio
 
 	mocha.run(function (failures) {
 		process.on('exit', function () {
-			process.exit(failures);
+			db.close();
+			console.log(process.exit(failures));
 		});
 	});
 });
