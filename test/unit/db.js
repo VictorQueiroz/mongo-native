@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Q = require('q');
-var Native = require('../../');
+var MongoNative = require('../../');
+var randomstring = require('randomstring');
 
 describe('db', function () {
 	it('should add a user to the database', function (done) {
@@ -115,7 +116,7 @@ describe('db', function () {
 
 	it('should emit native events', function (done) {
 		var called;
-		Native.connect('mongodb://localhost/dbtest').then(function (db) {
+		MongoNative.connect('mongodb://localhost/dbtest').then(function (db) {
 			called = false;
 			db.on('close', function (e) {
 				called = true;
@@ -131,14 +132,15 @@ describe('db', function () {
 	})
 
 	it('should authenticate a user against the server', function (done) {
-		db.addUser('user2', 'name').then(function(result) {
+		var username = randomstring.generate(7);
+		db.addUser(username, 'name').then(function(result) {
 	    // Authenticate
-	    return db.authenticate('user2', 'name');
+	    return db.authenticate(username, 'name');
 	  }).then(function(result) {
 			assert.equal(true, result);
 
 			// Remove the user from the db
-			return db.removeUser('user2');
+			return db.removeUser(username);
 		}).then(function(result) {
 			assert.ok(result);
 			done();
@@ -184,7 +186,7 @@ describe('db', function () {
 	it('should fetch a specific collection (containing the actual collection information)', function (done) {
 		db.collection('should_open_database', function (err, collection) {
 			assert.equal(null, err)
-			assert.ok(collection instanceof Native.Collection);
+			assert.ok(collection instanceof MongoNative.Collection);
 			done();
 		}, function (err) {
 			done(err);

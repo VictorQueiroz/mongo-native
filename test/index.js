@@ -11,27 +11,29 @@ var testFiles = glob.sync(path.join(__dirname, '**/*.js'));
 var mocha = new Mocha({
 	reporter: 'spec',
 	ui: 'bdd',
-	watch: true
+	watch: true,
+	timeout: 2000
 });
 
 _.forEach(testFiles, function (filePath) {
 	mocha.addFile(filePath);
 });
 
-MongoClient.connect('mongodb://localhost/testdb', function (err, db) {
+MongoClient.connect('mongodb://localhost/testdb', {replSet: ['testdb']}, function (err, db) {
 	if(err) {
 		return console.log(err);
 	}
 
-	var Native = global.Native = require('../index');
-	var Db = Native.Db;
+	var MongoNative = global.MongoNative = require('../index');
+	var Db = MongoNative.Db;
 	global.db = new Db(db);
 	global.assert = require('assert');
 	global.ObjectId = require('bson').ObjectId;
 
 	mocha.run(function (failures) {
 		process.on('exit', function () {
-			process.exit(failures);
+			db.close();
+			console.log(process.exit(failures));
 		});
 	});
 });
