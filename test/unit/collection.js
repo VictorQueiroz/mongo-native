@@ -2,7 +2,7 @@ var _ = require('lodash');
 
 describe('collection', function () {
 	var users = db.collection('users');
-
+	
 	it('should insert a document', function (done) {
 		users.insert([
 			{ name: 'my name' },
