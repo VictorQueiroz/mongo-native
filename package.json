@@ -1,6 +1,6 @@
 {
   "name": "mongo-native",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Native MongoDB API with promises just to make you happy",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^3.8.0",
-    "mongodb": "^2.0.31",
+    "mongodb": "^2.0.35",
     "q": "^1.4.0"
   },
   "devDependencies": {
