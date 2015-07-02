@@ -1,6 +1,6 @@
 {
   "name": "mongo-native",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "Native MongoDB API with promises just to make you happy",
   "main": "index.js",
   "scripts": {
