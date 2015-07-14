@@ -113,7 +113,6 @@ describe('collection', function () {
 				}
 			}).then(function (result) {
 				assert.ok(result.ok);
-				assert.equal(result.nModified, 1)
 				assert.equal(result.n, 1)
 
 				return users.findOne({
