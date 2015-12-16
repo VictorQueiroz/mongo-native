@@ -1,4 +1,4 @@
-# mongo-native
+# mongo-native (DEPRECATED: Use `mongodb`)
 
 Native MongoDB API with promises just to make you happy.
 
